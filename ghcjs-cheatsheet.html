@@ -1,0 +1,130 @@
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html><html>
+<head>
+<style type="text/css"> body {
+  color: #505050;
+  background-color: white;
+  font-family: Helvetica, arial, sans-serif;
+}
+
+a {
+  color: #4183C4;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.sect1 {
+  max-width: 62.5em;
+  margin: 0 auto 0;
+}
+
+h2 {
+  border-bottom: 1px solid #cccccc;
+}
+
+p {
+  line-height: 1.6;
+}
+
+pre, code {
+  font-family: "Source Code Pro", "Bitstream Vera Sans Mono", "Consolas", "Liberation Mono", Courier, monospace;
+}
+
+pre {
+  background-color: #fbfbfb;
+  padding: 0.46em 0.76em;
+  border: 1px solid silver;
+  border-radius: 0.25em;
+  overflow: auto;
+}
+
+:not(pre) > code {
+  background-color: #fbfbfb;
+  padding: 0 0.25em;
+  border: 1px solid silver;
+  border-radius: 0.25em;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+table th, table td {
+  padding: 0.46em 0.76em;
+  border: 1px solid silver;
+}
+
+.frame {
+  margin: 0;
+  padding: 0;
+  border: 1px solid silver;
+  border-radius: 0.25em;
+}
+
+.frame .title {
+  display: inline-block;
+  margin: 0;
+  padding: 0.25em 0.5em;
+  border-right: 1px solid silver;
+  border-bottom: 1px solid silver;
+  border-bottom-right-radius: 0.25em;
+}
+
+.frame .content {
+  margin: 0;
+  padding: 0 0.5em;
+}
+
+.code-frame {
+  background-color: #fbfbfb;
+}
+
+.code-frame .title {
+  background-color: #f8f8f8;
+}
+
+.code-frame .content pre {
+  padding: 0;
+  border-style: none;
+}
+
+.hljs {
+  background-color: #fbfbfb !important;
+}
+</style><script src="http://yandex.st/highlightjs/8.0/highlight.min.js"></script>
+<script type="text/javascript">hljs.initHighlightingOnLoad();</script>
+<script src="http://yandex.st/highlightjs/8.0/languages/haskell.min.js"></script>
+<link rel="stylesheet" href="http://yandex.st/highlightjs/8.0/styles/github.min.css">
+</head><body><div class="sect1"> <h1> GHCJS cheatsheet</h1><p></p><div class="sect2"><h2> Installation</h2><p></p><div class="sect3"><h3> GHC 7.8.1</h3><p></p><pre>&#10;wget&nbsp;https://www.haskell.org/ghc/dist/7.8.1/ghc-7.8.1-src.tar.bz2&#10;tar&nbsp;-xf&nbsp;ghc-7.8.1-src.tar.bz2&#10;cd&nbsp;ghc-7.8.1&#10;perl&nbsp;boot&#10;./configure&#10;make&#10;make&nbsp;install</pre><p></p></div><div class="sect3"><h3> GHCJS</h3><p><a href="https://gist.github.com/pasberth/10245898">この Gist</a> も見てね</p><p></p><pre>&#10;git&nbsp;clone&nbsp;git@github.com:ghcjs/cabal.git&#10;git&nbsp;clone&nbsp;git@github.com:ghcjs/ghcjs.git&#10;cd&nbsp;cabal&#10;git&nbsp;checkout&nbsp;ghcjs&#10;cabal&nbsp;install&nbsp;./Cabal&nbsp;./cabal-install&#10;cd&nbsp;..&#10;cabal&nbsp;install&nbsp;./ghcjs&#10;ghcjs-boot&nbsp;--init&#10;</pre><p></p></div></div><div class="sect2"><h2> hello world</h2><p>例示は理解の試金石です。
+alert で hello world してみましょう！</p><p></p><div class="frame code-frame">
+<div class="title"> <a href="ghcjs/alert.hs">alert.hs</a>
+</div><div class="content"><pre><code class="haskell language-haskell">{-#&nbsp;LANGUAGE&nbsp;JavaScriptFFI&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#-}&#10;{-#&nbsp;LANGUAGE&nbsp;OverloadedStrings&nbsp;&nbsp;#-}&#10;&#10;import&nbsp;qualified&nbsp;GHCJS.Types&nbsp;&nbsp;&nbsp;&nbsp;as&nbsp;T&#10;import&nbsp;qualified&nbsp;GHCJS.Foreign&#10;&#10;foreign&nbsp;import&nbsp;javascript&nbsp;unsafe&nbsp;"alert($1)"&nbsp;alert&nbsp;::&nbsp;T.JSString&nbsp;-&gt;&nbsp;IO&nbsp;()&#10;&#10;main&nbsp;=&nbsp;alert&nbsp;"hello&nbsp;world"</code></pre></div></div><p><a href="ghcjs/alert.jsexe/index.html">実際の表示</a> はこうなります。
+生成される JavaScript には Dart も真っ青です。</p><p></p></div><div class="sect2"><h2> JavaScript の値を扱う</h2><p><a href="https://github.com/ghcjs/ghcjs-base">ghc-base</a> にいろいろあります。
+コードが読みやすいので読むとよろし。</p><p></p></div><div class="sect2"><h2> コールバック関数をつくる(onload,onclick など)</h2><p>Haskell の関数はそのままでは渡せません。
+onload などに渡す関数は <code>JSFun a</code> 型でないといけません。
+そして <code>JSFun a</code> 型の値は <code>syncCallback</code>, <code>syncCallback1</code>, <code>syncCallback2</code>, 
+<code>asyncCallback</code>, <code>asyncCallback1</code>, <code>asyncCallback2</code> などの
+関数でつくることができます。 <code>1</code> とか <code>2</code> は引数の数です。</p><p></p><div class="frame code-frame">
+<div class="title"> <a href="ghcjs/onload.hs">onload.hs</a>
+</div><div class="content"><pre><code class="haskell language-haskell">{-#&nbsp;LANGUAGE&nbsp;JavaScriptFFI&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#-}&#10;{-#&nbsp;LANGUAGE&nbsp;OverloadedStrings&nbsp;&nbsp;#-}&#10;&#10;import&nbsp;qualified&nbsp;GHCJS.Types&nbsp;&nbsp;&nbsp;&nbsp;as&nbsp;T&#10;import&nbsp;qualified&nbsp;GHCJS.Foreign&nbsp;&nbsp;as&nbsp;F&#10;&#10;foreign&nbsp;import&nbsp;javascript&nbsp;unsafe&nbsp;"window.onload&nbsp;=&nbsp;$1"&nbsp;onload&nbsp;::&nbsp;T.JSFun&nbsp;a&nbsp;-&gt;&nbsp;IO&nbsp;()&#10;foreign&nbsp;import&nbsp;javascript&nbsp;unsafe&nbsp;"alert($1)"&nbsp;alert&nbsp;::&nbsp;T.JSString&nbsp;-&gt;&nbsp;IO&nbsp;()&#10;&#10;main&nbsp;=&nbsp;do&#10;&nbsp;&nbsp;callback&nbsp;&lt;-&nbsp;F.syncCallback&nbsp;F.AlwaysRetain&nbsp;True&nbsp;$&nbsp;do&#10;&nbsp;&nbsp;&nbsp;&nbsp;alert&nbsp;"hello&nbsp;world"&#10;&nbsp;&nbsp;onload&nbsp;callback</code></pre></div></div><p></p></div><div class="sect2"><h2> FFI の変数 (<code>$1</code>,<code>$2</code>,<code>$r</code>など)</h2><p>おそらく察しはついていると思いますが <code>$1</code> とか <code>$2</code> という
+変数に引数が与えられます。ただ特殊な変数がひとつあります。
+もし文から値を返したいときは <code>$r</code> という変数に代入します。
+例。</p><p></p><div class="frame code-frame">
+<div class="title"> <a href="ghcjs/shigo-sabaki-ni-au.hs">shigo-sabaki-ni-au.hs</a>
+</div><div class="content"><pre><code class="haskell language-haskell">{-#&nbsp;LANGUAGE&nbsp;JavaScriptFFI&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#-}&#10;{-#&nbsp;LANGUAGE&nbsp;OverloadedStrings&nbsp;&nbsp;#-}&#10;&#10;import&nbsp;qualified&nbsp;GHCJS.Types&nbsp;&nbsp;&nbsp;&nbsp;as&nbsp;T&#10;import&nbsp;qualified&nbsp;GHCJS.Foreign&#10;&#10;foreign&nbsp;import&nbsp;javascript&nbsp;unsafe&nbsp;"alert($1)"&nbsp;alert&nbsp;::&nbsp;T.JSString&nbsp;-&gt;&nbsp;IO&nbsp;()&#10;foreign&nbsp;import&nbsp;javascript&nbsp;unsafe&nbsp;"try&nbsp;{&nbsp;$r&nbsp;=&nbsp;$1.length&nbsp;}&nbsp;catch&nbsp;(nigiritubusu)&nbsp;{&nbsp;$r&nbsp;=&nbsp;null&nbsp;}"&nbsp;js_unsafeLength&nbsp;::&nbsp;T.JSRef&nbsp;a&nbsp;-&gt;&nbsp;T.JSNumber&#10;foreign&nbsp;import&nbsp;javascript&nbsp;unsafe&nbsp;"\"\"+$1"&nbsp;js_toString&nbsp;::&nbsp;T.JSRef&nbsp;a&nbsp;-&gt;&nbsp;T.JSString&#10;&#10;js_is_shigo_sabaki_ni_au&nbsp;::&nbsp;T.JSRef&nbsp;a&nbsp;-&gt;&nbsp;IO&nbsp;()&#10;js_is_shigo_sabaki_ni_au&nbsp;=&nbsp;alert&nbsp;.&nbsp;js_toString&nbsp;.&nbsp;js_unsafeLength&#10;&#10;main&nbsp;=&nbsp;do&#10;&nbsp;&nbsp;js_is_shigo_sabaki_ni_au&nbsp;("answer&nbsp;to&nbsp;life&nbsp;the&nbsp;universe&nbsp;and&nbsp;everything"&nbsp;::&nbsp;T.JSString)&#10;&nbsp;&nbsp;js_is_shigo_sabaki_ni_au&nbsp;T.nullRef</code></pre></div></div><p></p><p></p></div><div style='margin-top: 4em;text-align: center;'>
+&#169; Copyright 2014, <a href="https://twitter.com/pasberth">Pasberth</a>.
+Created using <a href="https://github.com/pasberth/paradocs">Paradocs</a>.
+</div></div></body></html>
