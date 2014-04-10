@@ -1,0 +1,76 @@
+%include ../paradocs/lib/paradocs/html.pdoc
+
+= GHCJS cheatsheet
+
+== Installation｡｡
+
+=== GHC 7.8.1
+
+%pre"""
+wget https://www.haskell.org/ghc/dist/7.8.1/ghc-7.8.1-src.tar.bz2
+tar -xf ghc-7.8.1-src.tar.bz2
+cd ghc-7.8.1
+perl boot
+./configure
+make
+make install"""
+
+=== GHCJS
+
+`https://gist.github.com/pasberth/10245898`この Gist` も見てね
+
+%pre"""
+git clone git@github.com:ghcjs/cabal.git
+git clone git@github.com:ghcjs/ghcjs.git
+cd cabal
+git checkout ghcjs
+cabal install ./Cabal ./cabal-install
+cd ..
+cabal install ./ghcjs
+ghcjs-boot --init
+"""
+
+== hello world
+
+例示は理解の試金石です。
+alert で hello world してみましょう！
+
+%code-frame
+%title `ghcjs/alert.hs`alert.hs`
+%content%haskell%read ghcjs/alert.hs
+
+`ghcjs/alert.jsexe/index.html`実際の表示` はこうなります。
+生成される JavaScript には Dart も真っ青です。
+
+== JavaScript の値を扱う
+
+`https://github.com/ghcjs/ghcjs-base`ghc-base` にいろいろあります。
+コードが読みやすいので読むとよろし。
+
++fromJSRef+ とか +toJSRef+ でいろいろできます。
++fromJSString+ とか +toJSString+ も使えます。｡
+
+== コールバック関数をつくる(onload,onclick など)
+
+Haskell の関数はそのままでは渡せません。
+onload などに渡す関数は +JSFun a+ 型でないといけません。
+そして +JSFun a+ 型の値は +syncCallback+, +syncCallback1+, +syncCallback2+, 
++asyncCallback+, +asyncCallback1+, +asyncCallback2+ などの
+関数でつくることができます。 +1+ とか +2+ は引数の数です。
+
+%code-frame
+%title `ghcjs/onload.hs`onload.hs`
+%content%haskell%read ghcjs/onload.hs
+
+== FFI の変数 (+$1+,+$2+,+$r+など)
+
+おそらく察しはついていると思いますが +$1+ とか +$2+ という
+変数に引数が与えられます。ただ特殊な変数がひとつあります。
+もし文から値を返したいときは +$r+ という変数に代入します。
+例。
+
+%code-frame
+%title `ghcjs/shigo-sabaki-ni-au.hs`shigo-sabaki-ni-au.hs`
+%content%haskell%read ghcjs/shigo-sabaki-ni-au.hs
+
+%include pdoc/footer.pdoc
