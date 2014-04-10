@@ -113,7 +113,8 @@ alert で hello world してみましょう！</p><p></p><div class="frame code-
 <div class="title"> <a href="ghcjs/alert.hs">alert.hs</a>
 </div><div class="content"><pre><code class="haskell language-haskell">{-#&nbsp;LANGUAGE&nbsp;JavaScriptFFI&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#-}&#10;{-#&nbsp;LANGUAGE&nbsp;OverloadedStrings&nbsp;&nbsp;#-}&#10;&#10;import&nbsp;qualified&nbsp;GHCJS.Types&nbsp;&nbsp;&nbsp;&nbsp;as&nbsp;T&#10;import&nbsp;qualified&nbsp;GHCJS.Foreign&#10;&#10;foreign&nbsp;import&nbsp;javascript&nbsp;unsafe&nbsp;"alert($1)"&nbsp;alert&nbsp;::&nbsp;T.JSString&nbsp;-&gt;&nbsp;IO&nbsp;()&#10;&#10;main&nbsp;=&nbsp;alert&nbsp;"hello&nbsp;world"</code></pre></div></div><p><a href="ghcjs/alert.jsexe/index.html">実際の表示</a> はこうなります。
 生成される JavaScript には Dart も真っ青です。</p><p></p></div><div class="sect2"><h2> JavaScript の値を扱う</h2><p><a href="https://github.com/ghcjs/ghcjs-base">ghc-base</a> にいろいろあります。
-コードが読みやすいので読むとよろし。</p><p></p></div><div class="sect2"><h2> コールバック関数をつくる(onload,onclick など)</h2><p>Haskell の関数はそのままでは渡せません。
+コードが読みやすいので読むとよろし。</p><p><code>fromJSRef</code> とか <code>toJSRef</code> でいろいろできます。
+<code>fromJSString</code> とか <code>toJSString</code> も使えます。｡</p><p></p></div><div class="sect2"><h2> コールバック関数をつくる(onload,onclick など)</h2><p>Haskell の関数はそのままでは渡せません。
 onload などに渡す関数は <code>JSFun a</code> 型でないといけません。
 そして <code>JSFun a</code> 型の値は <code>syncCallback</code>, <code>syncCallback1</code>, <code>syncCallback2</code>, 
 <code>asyncCallback</code>, <code>asyncCallback1</code>, <code>asyncCallback2</code> などの
@@ -127,4 +128,5 @@ onload などに渡す関数は <code>JSFun a</code> 型でないといけませ
 </div><div class="content"><pre><code class="haskell language-haskell">{-#&nbsp;LANGUAGE&nbsp;JavaScriptFFI&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#-}&#10;{-#&nbsp;LANGUAGE&nbsp;OverloadedStrings&nbsp;&nbsp;#-}&#10;&#10;import&nbsp;qualified&nbsp;GHCJS.Types&nbsp;&nbsp;&nbsp;&nbsp;as&nbsp;T&#10;import&nbsp;qualified&nbsp;GHCJS.Foreign&#10;&#10;foreign&nbsp;import&nbsp;javascript&nbsp;unsafe&nbsp;"alert($1)"&nbsp;alert&nbsp;::&nbsp;T.JSString&nbsp;-&gt;&nbsp;IO&nbsp;()&#10;foreign&nbsp;import&nbsp;javascript&nbsp;unsafe&nbsp;"try&nbsp;{&nbsp;$r&nbsp;=&nbsp;$1.length&nbsp;}&nbsp;catch&nbsp;(nigiritubusu)&nbsp;{&nbsp;$r&nbsp;=&nbsp;null&nbsp;}"&nbsp;js_unsafeLength&nbsp;::&nbsp;T.JSRef&nbsp;a&nbsp;-&gt;&nbsp;T.JSNumber&#10;foreign&nbsp;import&nbsp;javascript&nbsp;unsafe&nbsp;"\"\"+$1"&nbsp;js_toString&nbsp;::&nbsp;T.JSRef&nbsp;a&nbsp;-&gt;&nbsp;T.JSString&#10;&#10;js_is_shigo_sabaki_ni_au&nbsp;::&nbsp;T.JSRef&nbsp;a&nbsp;-&gt;&nbsp;IO&nbsp;()&#10;js_is_shigo_sabaki_ni_au&nbsp;=&nbsp;alert&nbsp;.&nbsp;js_toString&nbsp;.&nbsp;js_unsafeLength&#10;&#10;main&nbsp;=&nbsp;do&#10;&nbsp;&nbsp;js_is_shigo_sabaki_ni_au&nbsp;("answer&nbsp;to&nbsp;life&nbsp;the&nbsp;universe&nbsp;and&nbsp;everything"&nbsp;::&nbsp;T.JSString)&#10;&nbsp;&nbsp;js_is_shigo_sabaki_ni_au&nbsp;T.nullRef</code></pre></div></div><p></p><p></p></div><div style='margin-top: 4em;text-align: center;'>
 &#169; Copyright 2014, <a href="https://twitter.com/pasberth">Pasberth</a>.
 Created using <a href="https://github.com/pasberth/paradocs">Paradocs</a>.
+
 </div></div></body></html>
